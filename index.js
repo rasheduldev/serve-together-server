@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import 'dotenv/config'
 const app = express()
 const PORT = 8000
@@ -35,6 +35,11 @@ app.get('/upcoming-events', async(req, res)=>{
   res.send(result)
 })
 
+app.get('/upcoming-event/:id', async(req, res)=>{
+  const {id} = req.params
+  const result = await eventCollection.findOne({_id: new ObjectId(id)})
+  res.send(result)
+})
 // http://localhost:8000
 app.get('/', (req, res)=>{
     res.send({message:'Server is running fine!'})
