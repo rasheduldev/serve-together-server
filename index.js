@@ -30,6 +30,11 @@ app.post('/create-event', async(req, res)=>{
     res.send(result)
 } )
 
+app.get('/upcoming-events', async(req, res)=>{
+  const result = await eventCollection.find().toArray()
+  res.send(result)
+})
+
 // http://localhost:8000
 app.get('/', (req, res)=>{
     res.send({message:'Server is running fine!'})
