@@ -22,6 +22,7 @@ export async function connectToMongoDB() {
 const mongoClient = await connectToMongoDB()
 const db = mongoClient.db('serveTogether')
 const eventCollection = db.collection('event')
+const joinedEventCollection = db.collection('joinedEvents')
 // http://localhost:8000/create-event
 app.post('/create-event', async(req, res)=>{
     const data = req.body
@@ -60,6 +61,24 @@ app.delete('/delete-event/:id', async (req, res) => {
 
   const result = await eventCollection.deleteOne({
     _id: new ObjectId(id)
+  })
+
+  res.send(result)
+})
+
+app.post('/join-event', async (req, res) => {
+  const { eventId, userEmail } = req.body
+  const alreadyJoined = await joinedEventCollection.findOne({
+    eventId,
+    userEmail
+  })
+  if (alreadyJoined) {
+    return res.send({ message: 'Already joined' })
+  }
+  const result = await joinedEventCollection.insertOne({
+    eventId,
+    userEmail,
+    joinedAt: new Date()
   })
 
   res.send(result)
