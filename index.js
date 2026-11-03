@@ -55,6 +55,16 @@ app.patch('/update-event/:id', async (req, res) => {
   res.send(result)
 })
 
+app.delete('/delete-event/:id', async (req, res) => {
+  const { id } = req.params
+
+  const result = await eventCollection.deleteOne({
+    _id: new ObjectId(id)
+  })
+
+  res.send(result)
+})
+
 // http://localhost:8000
 app.get('/', (req, res)=>{
     res.send({message:'Server is running fine!'})
