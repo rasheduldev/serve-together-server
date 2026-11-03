@@ -40,6 +40,13 @@ app.get('/upcoming-event/:id', async(req, res)=>{
   const result = await eventCollection.findOne({_id: new ObjectId(id)})
   res.send(result)
 })
+
+app.get('/my-events/:email', async (req, res) => {
+  const { email } = req.params
+  const result = await eventCollection.find({ organizerEmail: email }).toArray()
+  res.send(result)
+})
+
 // http://localhost:8000
 app.get('/', (req, res)=>{
     res.send({message:'Server is running fine!'})
