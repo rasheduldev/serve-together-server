@@ -46,6 +46,14 @@ app.get('/my-events/:email', async (req, res) => {
   const result = await eventCollection.find({ organizerEmail: email }).toArray()
   res.send(result)
 })
+app.patch('/update-event/:id', async (req, res) => {
+  const result = await eventCollection.updateOne(
+    { _id: new ObjectId(req.params.id) },
+    { $set: req.body }
+  )
+
+  res.send(result)
+})
 
 // http://localhost:8000
 app.get('/', (req, res)=>{
