@@ -83,6 +83,15 @@ app.post('/join-event', async (req, res) => {
 
   res.send(result)
 })
+app.get('/joined-events/:email', async (req, res) => {
+  const { email } = req.params
+
+  const joinedEvents = await joinedEventCollection
+    .find({ userEmail: email })
+    .toArray()
+
+  res.send(joinedEvents)
+})
 
 // http://localhost:8000
 app.get('/', (req, res)=>{
