@@ -35,7 +35,7 @@ const varifyToken = async(req, res, next)=>{
       return res.status(401).send({msg:'Unauthorized!'})
     }
     
-    const JWKS = createRemoteJWKSet(new URL('http://localhost:3000/api/auth/jwks'))
+    const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`))
     try{
       const {payload} = await jwtVerify(token, JWKS)
       next()
@@ -45,7 +45,7 @@ const varifyToken = async(req, res, next)=>{
 }
 
 // http://localhost:8000/create-event
-app.post('/create-event',  async(req, res)=>{
+app.post('/create-event',varifyToken,  async(req, res)=>{
     const data = req.body
     const result = await eventCollection.insertOne(data)
     console.log(result)
@@ -56,6 +56,10 @@ app.get('/upcoming-events', async(req, res)=>{
   const result = await eventCollection.find().toArray()
   res.send(result)
 })
+app.get('/recent-upcoming-events', async(req, res)=>{
+  const result = await eventCollection.find().limit(6).toArray()
+  res.send(result)
+})
 
 app.get('/upcoming-event/:id', async(req, res)=>{
   const {id} = req.params
@@ -63,12 +67,12 @@ app.get('/upcoming-event/:id', async(req, res)=>{
   res.send(result)
 })
 
-app.get('/my-events/:email', async (req, res) => {
+app.get('/my-events/:email',varifyToken, async (req, res) => {
   const { email } = req.params
   const result = await eventCollection.find({ organizerEmail: email }).toArray()
   res.send(result)
 })
-app.patch('/update-event/:id', async (req, res) => {
+app.patch('/update-event/:id',varifyToken, async (req, res) => {
   const result = await eventCollection.updateOne(
     { _id: new ObjectId(req.params.id) },
     { $set: req.body }
@@ -77,7 +81,7 @@ app.patch('/update-event/:id', async (req, res) => {
   res.send(result)
 })
 
-app.delete('/delete-event/:id', async (req, res) => {
+app.delete('/delete-event/:id',varifyToken, async (req, res) => {
   const { id } = req.params
 
   const result = await eventCollection.deleteOne({
@@ -87,7 +91,7 @@ app.delete('/delete-event/:id', async (req, res) => {
   res.send(result)
 })
 
-app.post('/join-event', async (req, res) => {
+app.post('/join-event', varifyToken,async (req, res) => {
   const { eventId, userEmail } = req.body
   const alreadyJoined = await joinedEventCollection.findOne({
     eventId,
@@ -122,3 +126,5 @@ app.get('/', (req, res)=>{
 app.listen(PORT,()=>{
     console.log(`Server is running at ${PORT}`)
 })
+
+export default app
